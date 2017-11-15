@@ -1,0 +1,28 @@
+{
+  "name": "protractor-utils-module",
+  "version": "1.0.0",
+  "description": "protractor utils module",
+  "main": "Utils.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nils-hoyer/protractor-utils-module.git"
+  },
+  "keywords": [
+    "Protractor",
+    "Webdriver",
+    "Selenium",
+    "Jasmine",
+    "e2e",
+    "tesing",
+    "QA"
+  ],
+  "author": "nils.hoyer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nils-hoyer/protractor-utils-module/issues"
+  },
+  "homepage": "https://github.com/nils-hoyer/protractor-utils-module#readme",
+  "dependencies": {
+    "protractor-image-comparison": "^1.3.0"
+  }
+}
