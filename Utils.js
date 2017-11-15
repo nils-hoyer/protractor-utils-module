@@ -1,40 +1,6 @@
 const protractorImageComparison = require('protractor-image-comparison');
 
 /**
- * private function to set options {wait, waitClickable, scrollIntoView, moveMouse, listElement, imageComparison}
- * @param options
- * @returns {{}}
- */
-function optionSetter(options) {
-    return {
-        wait: options && options.hasOwnProperty('wait') ? options.wait : 500,
-        waitClickable: options && options.hasOwnProperty('waitClickable') ? options.waitClickable : 10000,
-        scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : false,
-        moveMouse: options && options.hasOwnProperty('moveMouse') ? options.moveMouse : false,
-        imageComparison: options && options.hasOwnProperty('imageComparison') ? options.imageComparison : {},
-    };
-}
-
-/**
- * private function to execute options
- * @param options
- */
-function optionExecutor(element, options) {
-    if (options.wait !== false && options.wait !== 0) {
-        browser.sleep(options.wait);
-    }
-    if (options.scrollIntoView) {
-        scrollIntoView(element);
-    }
-    if (options.moveMouse === true) {
-        browser.actions().mouseMove(element).perform();
-    }
-    if (options.waitClickable !== false && options.waitClickable !== 0) {
-        waitClickable(element, options);
-    }
-}
-
-/**
  * extended selenium element.click function
  * @param element
  * @param options
@@ -122,7 +88,7 @@ function getText(element, options) {
 function clearBrowserInstance() {
     browser.manage().deleteAllCookies();
     browser.executeScript('window.localStorage.clear()');
-    browser.executeScript('sessionStorage.clear()');
+    return browser.executeScript('sessionStorage.clear()');
 }
 
 /**
@@ -132,7 +98,7 @@ function clearBrowserInstance() {
  */
 function waitClickable(element, options) {
     options = optionSetter(options);
-    browser.wait(protractor.ExpectedConditions.elementToBeClickable(element), options.waitClickable).then().catch( () => {});
+    return browser.wait(protractor.ExpectedConditions.elementToBeClickable(element), options.waitClickable).then().catch( () => {});
 }
 
 /**
@@ -190,6 +156,39 @@ function switchToTab(tab) {
     });
 }
 
+/**
+ * private function to set options {wait, waitClickable, scrollIntoView, moveMouse, listElement, imageComparison}
+ * @param options
+ * @returns {{}}
+ */
+function optionSetter(options) {
+    return {
+        wait: options && options.hasOwnProperty('wait') ? options.wait : 500,
+        waitClickable: options && options.hasOwnProperty('waitClickable') ? options.waitClickable : 10000,
+        scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : false,
+        moveMouse: options && options.hasOwnProperty('moveMouse') ? options.moveMouse : false,
+        imageComparison: options && options.hasOwnProperty('imageComparison') ? options.imageComparison : {},
+    };
+}
+
+/**
+ * private function to execute options
+ * @param options
+ */
+function optionExecutor(element, options) {
+    if (options.wait !== false && options.wait !== 0) {
+        browser.sleep(options.wait);
+    }
+    if (options.scrollIntoView) {
+        scrollIntoView(element);
+    }
+    if (options.moveMouse === true) {
+        browser.actions().mouseMove(element).perform();
+    }
+    if (options.waitClickable !== false && options.waitClickable !== 0) {
+        waitClickable(element, options);
+    }
+}
 
 module.exports = {
     click: click,
