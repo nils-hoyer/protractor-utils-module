@@ -1,6 +1,6 @@
 {
   "name": "protractor-utils-module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "protractor utils module",
   "main": "Utils.js",
   "repository": {
@@ -14,7 +14,9 @@
     "Jasmine",
     "e2e",
     "tesing",
-    "QA"
+    "QA",
+    "implicitlyWait",
+    "wait"
   ],
   "author": "nils.hoyer",
   "license": "MIT",
