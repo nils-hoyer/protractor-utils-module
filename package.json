@@ -1,7 +1,7 @@
 {
   "name": "protractor-utils-module",
-  "version": "1.0.1",
-  "description": "protractor utils module",
+  "version": "2.0.0",
+  "description": "protractor utils module ensures visibility of elements before interaction",
   "main": "Utils.js",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
     "Jasmine",
     "e2e",
     "tesing",
-    "QA",
+    "qa",
     "implicitlyWait",
     "wait"
   ],
