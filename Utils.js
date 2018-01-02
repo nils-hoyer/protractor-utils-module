@@ -83,7 +83,9 @@ class ProtractorUtilsModule {
     getText(element, options) {
         options = this._optionSetter(options);
         this._optionExecutor(element, options);
-        return element.getText();
+        return element.getText().then(function (text) {
+            return text.replace(/\s/g, ' ');
+        });
     }
 
     /**
