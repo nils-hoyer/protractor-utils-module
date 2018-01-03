@@ -22,6 +22,7 @@ exports.config = {
         // custom initialization   
         const config = {
             wait: 200,
+            waitPresence: 2000,
             waitClickable: 5000,
             scrollIntoView: false,
         }

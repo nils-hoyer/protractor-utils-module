@@ -11,10 +11,11 @@ class ProtractorUtilsModule {
 
         this.config = {
             wait: config && config.hasOwnProperty('wait') ? config.wait : 500,
+            waitPresence: config && config.hasOwnProperty('waitPresence') ? config.waitPresence : 10000,
             waitClickable: config && config.hasOwnProperty('waitClickable') ? config.waitClickable : 10000,
             scrollIntoView: config && config.hasOwnProperty('scrollIntoView') ? config.scrollIntoView : false,
             imageComparison: config && config.hasOwnProperty('imageComparison') ? config.imageComparison : {},
-        }
+        };
 
         this.protractorImageComparison = new protractorImageComparison({
             baselineFolder: configImageComparison && configImageComparison.hasOwnProperty('baselineFolder') ?
@@ -26,10 +27,14 @@ class ProtractorUtilsModule {
     };
 
     /**
-     * function to open an url path to given domain
+     * function to open an url path to defined base url
      * @param path
      */
     get(path) {
+        if(!browser.baseUrl) {
+            throw new Error('unable to exeute get(). Please define config.baseUrl in protractor configuration file');
+        }
+
         return browser.get(browser.baseUrl + path);
     }
 
@@ -59,7 +64,7 @@ class ProtractorUtilsModule {
         return this.click(element.all(elementOption).get(elementOptionNumber), options);
     }
 
-     /**
+    /**
      * extended selenium element.sendKeys function
      * @param element
      * @param text
@@ -106,8 +111,10 @@ class ProtractorUtilsModule {
      * @param cls
      * @returns {promise.Promise<any>}
      */
-    hasClass(element, cls) {
-        return element.getAttribute('class').then(function(classes) {
+    hasClass(element, cls, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(element, options);
+        return element.getAttribute('class').then(function (classes) {
             return classes.split(' ').indexOf(cls) !== -1;
         });
     }
@@ -118,9 +125,20 @@ class ProtractorUtilsModule {
      * @param options
      * @returns {boolean}
      */
-    waitClickable(element, options) {
+    waitElementClickable(element, options) {
         options = this._optionSetter(options);
-        return browser.wait(protractor.ExpectedConditions.elementToBeClickable(element), options.waitClickable).then().catch( () => {});
+        return browser.wait(protractor.ExpectedConditions.elementToBeClickable(element), options.waitClickable).catch(() => {});
+    }
+
+    /**
+     * function to wait until an element is present
+     * @param element
+     * @param options
+     * @returns {Q.Promise<any> | Promise.<T> | promise.Promise<any>}
+     */
+    waitElementPresence(element, options) {
+        options = this._optionSetter(options);
+        return browser.wait(protractor.ExpectedConditions.presenceOf(element), options.waitClickable).catch(() => {});
     }
 
     /**
@@ -187,6 +205,7 @@ class ProtractorUtilsModule {
     _optionSetter(options) {
         return {
             wait: options && options.hasOwnProperty('wait') ? options.wait : this.config.wait,
+            waitPresence: options && options.hasOwnProperty('waitPresence') ? options.waitPresence : this.config.waitPresence,
             waitClickable: options && options.hasOwnProperty('waitClickable') ? options.waitClickable : this.config.waitClickable,
             scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : this.config.scrollIntoView,
             imageComparison: options && options.hasOwnProperty('imageComparison') ? options.imageComparison : this.config.imageComparison,
@@ -206,8 +225,11 @@ class ProtractorUtilsModule {
         if (options.scrollIntoView) {
             this.scrollIntoView(element);
         }
+        if (options.waitPresence !== false && options.waitPresence !== 0) {
+            this.waitElementPresence(element, options);
+        }
         if (options.waitClickable !== false && options.waitClickable !== 0) {
-            this.waitClickable(element, options);
+            this.waitElementClickable(element, options);
         }
     }
 
