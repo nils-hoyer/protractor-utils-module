@@ -11,7 +11,8 @@ class ProtractorUtilsModule {
 
         this.config = {
             wait: config && config.hasOwnProperty('wait') ? config.wait : 500,
-            waitPresence: config && config.hasOwnProperty('waitPresence') ? config.waitPresence : 10000,
+            waitPresence: config && config.hasOwnProperty('waitPresence') ? config.waitPresence : 5000,
+            waitInvisible: config && config.hasOwnProperty('waitInvisible') ? config.waitInvisible : 5000,
             waitClickable: config && config.hasOwnProperty('waitClickable') ? config.waitClickable : 10000,
             scrollIntoView: config && config.hasOwnProperty('scrollIntoView') ? config.scrollIntoView : false,
             imageComparison: config && config.hasOwnProperty('imageComparison') ? config.imageComparison : {},
@@ -103,6 +104,18 @@ class ProtractorUtilsModule {
         options = this._optionSetter(options);
         this._optionExecutor(element, options);
         return element.isDisplayed();
+    }
+
+    /**
+     * function to wait until an element is invisible
+     * @param element
+     * @param options
+     * @returns {Function}
+     */
+    isInvisible(element, options) {
+        options = this._optionSetter(options);
+        browser.wait(protractor.ExpectedConditions.invisibilityOf(element), options.waitInvisible)
+        return protractor.ExpectedConditions.invisibilityOf(element)();
     }
 
     /**
@@ -206,6 +219,7 @@ class ProtractorUtilsModule {
         return {
             wait: options && options.hasOwnProperty('wait') ? options.wait : this.config.wait,
             waitPresence: options && options.hasOwnProperty('waitPresence') ? options.waitPresence : this.config.waitPresence,
+            waitInvisible: options && options.hasOwnProperty('waitInvisible') ? options.waitInvisible : this.config.waitInvisible,
             waitClickable: options && options.hasOwnProperty('waitClickable') ? options.waitClickable : this.config.waitClickable,
             scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : this.config.scrollIntoView,
             imageComparison: options && options.hasOwnProperty('imageComparison') ? options.imageComparison : this.config.imageComparison,
