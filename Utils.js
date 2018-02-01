@@ -54,15 +54,15 @@ class ProtractorUtilsModule {
     /**
      * function to select an element of a dropdown list
      * @param element
-     * @param elementOption
+     * @param byOption
      * @param elementOptionNumber
      * @param options
      * @returns {ActionSequence|promise.Promise.<void>|webdriver.promise.Promise.<void>|*}
      */
-    clickDropdown(element, elementOption, elementOptionNumber, options) {
+    clickDropdown(element, byOption, elementOptionNumber, options) {
         options = this._optionSetter(options);
         this.click(element, options);
-        return this.click(element.all(elementOption).get(elementOptionNumber), options);
+        return this.click(element.all(byOption).get(elementOptionNumber), options);
     }
 
     /**
@@ -110,7 +110,7 @@ class ProtractorUtilsModule {
      * function to wait until an element is invisible
      * @param element
      * @param options
-     * @returns {Function}
+     * @returns {*}
      */
     isInvisible(element, options) {
         options = this._optionSetter(options);
@@ -163,6 +163,18 @@ class ProtractorUtilsModule {
         return browser.executeScript('arguments[0].scrollIntoView();', element.getWebElement());
     }
 
+
+    /**
+     * switch to specific browser tab
+     * @param tab
+     * @returns {promise.Promise<any>}
+     */
+    switchToTab(tab) {
+        return browser.getAllWindowHandles().then(function(handles) {
+            return browser.switchTo().window(handles[tab]);
+        });
+    }
+
     /**
      * function to clear cookies, session, storage
      * @returns {promise.Promise.<T>|promise.Promise<any>}
@@ -196,17 +208,6 @@ class ProtractorUtilsModule {
         options = this._optionSetter(options);
         this._optionExecutor(element, options);
         return this.protractorImageComparison.checkElement(element, tag, options.imageComparison);
-    }
-
-    /**
-     * switch to specific browser tab
-     * @param tab
-     * @returns {promise.Promise<any>}
-     */
-    switchToTab(tab) {
-        return browser.getAllWindowHandles().then(function(handles) {
-            return browser.switchTo().window(handles[tab]);
-        });
     }
 
     /**

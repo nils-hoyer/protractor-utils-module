@@ -39,7 +39,7 @@ exports.config = {
 in your jasmine test you can use the following functions:
 ```
 const ele = element(by.css('.element'));
-const opt = element(by.css('option'));
+const opt = by.css('option');
 
 describe('protractor-utils-module', function() {
     it('example usage', function() { 
