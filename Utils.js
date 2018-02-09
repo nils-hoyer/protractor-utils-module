@@ -10,11 +10,12 @@ class ProtractorUtilsModule {
     constructor(config, configImageComparison) {
 
         this.config = {
-            wait: config && config.hasOwnProperty('wait') ? config.wait : 500,
+            wait: config && config.hasOwnProperty('wait') ? config.wait : 200,
             waitPresence: config && config.hasOwnProperty('waitPresence') ? config.waitPresence : 5000,
             waitInvisible: config && config.hasOwnProperty('waitInvisible') ? config.waitInvisible : 5000,
             waitClickable: config && config.hasOwnProperty('waitClickable') ? config.waitClickable : 10000,
             scrollIntoView: config && config.hasOwnProperty('scrollIntoView') ? config.scrollIntoView : false,
+            moveMouse: config && config.hasOwnProperty('moveMouse') ? config.moveMouse : false,
             imageComparison: config && config.hasOwnProperty('imageComparison') ? config.imageComparison : {},
         };
 
@@ -48,21 +49,33 @@ class ProtractorUtilsModule {
     click(element, options) {
         options = this._optionSetter(options);
         this._optionExecutor(element, options);
-        return element.click();
+        if (!options.moveMouse) {
+            return element.click();
+        } else {
+            this.moveMouseTo(element, options);
+            return element.getSize().then((size) => {
+                const x = (options.moveMouse.x) ? size.width + options.moveMouse.x : 0;
+                const y = (options.moveMouse.y) ? size.height + options.moveMouse.y : 0;
+                return browser.actions()
+                    .mouseMove({x:x, y:y})
+                    .click()
+                    .perform();
+            });
+        }
     }
 
     /**
      * function to select an element of a dropdown list
      * @param element
      * @param byOption
-     * @param elementOptionNumber
+     * @param optionNumber
      * @param options
      * @returns {ActionSequence|promise.Promise.<void>|webdriver.promise.Promise.<void>|*}
      */
-    clickDropdown(element, byOption, elementOptionNumber, options) {
+    clickDropdown(element, byOption, optionNumber, options) {
         options = this._optionSetter(options);
         this.click(element, options);
-        return this.click(element.all(byOption).get(elementOptionNumber), options);
+        return this.click(element.all(byOption).get(optionNumber), options);
     }
 
     /**
@@ -110,7 +123,7 @@ class ProtractorUtilsModule {
      * function to wait until an element is invisible
      * @param element
      * @param options
-     * @returns {*}
+     * @returns {Function}
      */
     isInvisible(element, options) {
         options = this._optionSetter(options);
@@ -159,20 +172,19 @@ class ProtractorUtilsModule {
      * @param element
      * @returns {promise.Promise.<T>|promise.Promise<any>}
      */
-    scrollIntoView(element) {
+    scrollIntoView(element, options) {
         return browser.executeScript('arguments[0].scrollIntoView();', element.getWebElement());
     }
 
-
     /**
-     * switch to specific browser tab
-     * @param tab
-     * @returns {promise.Promise<any>}
+     * function to move mouse to element
+     * @param element
+     * @param options
+     * @returns {promise.Promise<void>}
      */
-    switchToTab(tab) {
-        return browser.getAllWindowHandles().then(function(handles) {
-            return browser.switchTo().window(handles[tab]);
-        });
+    moveMouseTo(element, options) {
+        options = this._optionSetter(options);
+        return browser.actions().mouseMove(element).perform();
     }
 
     /**
@@ -211,6 +223,17 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * switch to specific browser tab
+     * @param tab
+     * @returns {promise.Promise<any>}
+     */
+    switchToTab(tab) {
+        return browser.getAllWindowHandles().then(function(handles) {
+            return browser.switchTo().window(handles[tab]);
+        });
+    }
+
+    /**
      * private function to set options {wait, waitClickable, scrollIntoView, moveMouse, listElement, imageComparison}
      * @param options
      * @returns {{wait: *, waitClickable: number, scrollIntoView: boolean, moveMouse: boolean, imageComparison: {}}}
@@ -220,9 +243,9 @@ class ProtractorUtilsModule {
         return {
             wait: options && options.hasOwnProperty('wait') ? options.wait : this.config.wait,
             waitPresence: options && options.hasOwnProperty('waitPresence') ? options.waitPresence : this.config.waitPresence,
-            waitInvisible: options && options.hasOwnProperty('waitInvisible') ? options.waitInvisible : this.config.waitInvisible,
             waitClickable: options && options.hasOwnProperty('waitClickable') ? options.waitClickable : this.config.waitClickable,
             scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : this.config.scrollIntoView,
+            moveMouse: options && options.hasOwnProperty('moveMouse') ? options.moveMouse : this.config.moveMouse,
             imageComparison: options && options.hasOwnProperty('imageComparison') ? options.imageComparison : this.config.imageComparison,
         };
     }
@@ -237,14 +260,17 @@ class ProtractorUtilsModule {
         if (options.wait !== false && options.wait !== 0) {
             browser.sleep(options.wait);
         }
-        if (options.scrollIntoView) {
-            this.scrollIntoView(element);
-        }
         if (options.waitPresence !== false && options.waitPresence !== 0) {
             this.waitElementPresence(element, options);
         }
         if (options.waitClickable !== false && options.waitClickable !== 0) {
             this.waitElementClickable(element, options);
+        }
+        if (options.scrollIntoView) {
+            this.scrollIntoView(element, options);
+        }
+        if (options.moveMouse) {
+            this.moveMouseTo(element, options);
         }
     }
 
