@@ -24,7 +24,6 @@ exports.config = {
             wait: 200,
             waitPresence: 2000,
             waitClickable: 5000,
-            scrollIntoView: false,
         }
         const configImageComparison = {
             baselineFolder: 'path/to/baselineFolder'
@@ -40,6 +39,7 @@ in your jasmine test you can use the following functions:
 ```
 const ele = element(by.css('.element'));
 const opt = by.css('option');
+const url = 'https://www.google.de'
 
 describe('protractor-utils-module', function() {
     it('example usage', function() { 
@@ -50,12 +50,19 @@ describe('protractor-utils-module', function() {
         browser.utils.sendKeys(ele, 'text');
         browser.utils.sendKeys(ele, 'text', {scrollIntoView: true});
         browser.utils.getText(ele);
+        browser.utils.isSelected(ele);
+        browser.utils.isInvisible(ele);
         browser.utils.isDisplayed(ele);
+        browser.utils.waitElementPresence(ele);
+        browser.utils.waitElementClickable(ele);
+        browser.utils.moveMouseTo(ele);
+        browser.utils.scrollIntoView(ele);
         browser.utils.hasClass(ele, 'has-error');
         browser.utils.clearBrowserInstance();
         browser.utils.checkScreen('name');
         browser.utils.checkElement('name', ele);
         browser.utils.checkElement('name', ele, {waitClickable: 15000});
+        browser.utils.newTab(url)
         browser.utils.switchToTab(1);      
     });
 });

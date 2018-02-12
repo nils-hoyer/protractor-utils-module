@@ -14,8 +14,6 @@ class ProtractorUtilsModule {
             waitPresence: config && config.hasOwnProperty('waitPresence') ? config.waitPresence : 5000,
             waitInvisible: config && config.hasOwnProperty('waitInvisible') ? config.waitInvisible : 5000,
             waitClickable: config && config.hasOwnProperty('waitClickable') ? config.waitClickable : 10000,
-            scrollIntoView: config && config.hasOwnProperty('scrollIntoView') ? config.scrollIntoView : false,
-            moveMouse: config && config.hasOwnProperty('moveMouse') ? config.moveMouse : false,
             imageComparison: config && config.hasOwnProperty('imageComparison') ? config.imageComparison : {},
         };
 
@@ -36,7 +34,6 @@ class ProtractorUtilsModule {
         if(!browser.baseUrl) {
             throw new Error('unable to exeute get(). Please define config.baseUrl in protractor configuration file');
         }
-
         return browser.get(browser.baseUrl + path);
     }
 
@@ -50,7 +47,7 @@ class ProtractorUtilsModule {
         options = this._optionSetter(options);
         this._optionExecutor(element, options);
         if (!options.moveMouse) {
-            return element.click();
+            return element.click(options.buttonType);
         } else {
             this.moveMouseTo(element, options);
             return element.getSize().then((size) => {
@@ -58,7 +55,7 @@ class ProtractorUtilsModule {
                 const y = (options.moveMouse.y) ? size.height + options.moveMouse.y : 0;
                 return browser.actions()
                     .mouseMove({x:x, y:y})
-                    .click()
+                    .click(options.buttonType)
                     .perform();
             });
         }
@@ -75,6 +72,7 @@ class ProtractorUtilsModule {
     clickDropdown(element, byOption, optionNumber, options) {
         options = this._optionSetter(options);
         this.click(element, options);
+
         return this.click(element.all(byOption).get(optionNumber), options);
     }
 
@@ -105,6 +103,18 @@ class ProtractorUtilsModule {
         return element.getText().then(function (text) {
             return text.replace(/\s/g, ' ');
         });
+    }
+
+    /**
+     * extends selenium element.isSelected function
+     * @param element
+     * @param options
+     * @returns {*|promise.Promise<boolean>|webdriver.promise.Promise.<boolean>}
+     */
+    isSelected(element, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(element, options);
+        return element.isSelected();
     }
 
     /**
@@ -223,6 +233,15 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * opens a url in a new tab
+     * @param url
+     * @returns {promise.Promise.<T>|promise.Promise<any>}
+     */
+    newTab(url) {
+        return browser.executeScript('return window.open(arguments[0], "_blank")', url);
+    }
+
+    /**
      * switch to specific browser tab
      * @param tab
      * @returns {promise.Promise<any>}
@@ -243,10 +262,14 @@ class ProtractorUtilsModule {
         return {
             wait: options && options.hasOwnProperty('wait') ? options.wait : this.config.wait,
             waitPresence: options && options.hasOwnProperty('waitPresence') ? options.waitPresence : this.config.waitPresence,
+            waitInvisible: options && options.hasOwnProperty('waitInvisible') ? options.waitInvisible : this.config.waitInvisible,
             waitClickable: options && options.hasOwnProperty('waitClickable') ? options.waitClickable : this.config.waitClickable,
-            scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : this.config.scrollIntoView,
-            moveMouse: options && options.hasOwnProperty('moveMouse') ? options.moveMouse : this.config.moveMouse,
             imageComparison: options && options.hasOwnProperty('imageComparison') ? options.imageComparison : this.config.imageComparison,
+
+            scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : false,
+            moveMouse: options && options.hasOwnProperty('moveMouse') ? options.moveMouse : false,
+            buttonType: options && options.hasOwnProperty('buttonType') && options.buttonType === 'right'
+                ? protractor.Button.RIGHT : protractor.Button.LEFT,
         };
     }
 
