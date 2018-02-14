@@ -63,7 +63,8 @@ describe('protractor-utils-module', function() {
         browser.utils.checkElement('name', ele);
         browser.utils.checkElement('name', ele, {waitClickable: 15000});
         browser.utils.newTab(url)
-        browser.utils.switchToTab(1);      
+        browser.utils.switchToTab(1);
+        browser.utils.switchToFrame();      
     });
 });
 ```

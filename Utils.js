@@ -253,6 +253,18 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * switch to iFrame
+     * @param options
+     * @returns {*}
+     */
+    switchToFrame(options) {
+        const ele = element(by.tagName('iframe'));
+        options = this._optionSetter(options);
+        this._optionExecutor(ele, options);
+        return browser.switchTo().frame(ele.getWebElement());
+    }
+
+    /**
      * private function to set options {wait, waitClickable, scrollIntoView, moveMouse, listElement, imageComparison}
      * @param options
      * @returns {{wait: *, waitClickable: number, scrollIntoView: boolean, moveMouse: boolean, imageComparison: {}}}
