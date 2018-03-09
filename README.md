@@ -1,5 +1,5 @@
 # protractor-utils-module
-Extends basic Protractor functionality to ensures visibility of elements before interaction. Added useful custom functions to the utils.
+Extends basic Protractor functionality to ensures visibility of elments before interaction. Added useful custom functions to the utils.
 
 # usage
 The protractor-utils-module is available via npm:
@@ -37,34 +37,42 @@ exports.config = {
 
 in your jasmine test you can use the following functions:
 ```
-const ele = element(by.css('.element'));
+const el = elment(by.css('.elment'));
 const opt = by.css('option');
 const url = 'https://www.google.de'
 
 describe('protractor-utils-module', function() {
     it('example usage', function() { 
         browser.utils.get('/path');
-        browser.utils.click(ele);
-        browser.utils.click(ele, {wait: 1000});
-        browser.utils.clickDropdown(ele, opt, 3);
-        browser.utils.sendKeys(ele, 'text');
-        browser.utils.sendKeys(ele, 'text', {scrollIntoView: true});
-        browser.utils.getText(ele);
-        browser.utils.isSelected(ele);
-        browser.utils.isInvisible(ele);
-        browser.utils.isDisplayed(ele);
-        browser.utils.waitElementPresence(ele);
-        browser.utils.waitElementClickable(ele);
-        browser.utils.moveMouseTo(ele);
-        browser.utils.scrollIntoView(ele);
-        browser.utils.hasClass(ele, 'has-error');
+        browser.utils.click(el);
+        browser.utils.click(el, {wait: 1000});
+        browser.utils.doubleClick(el);
+        browser.utils.clickDropdown(el, opt, 3);
+        browser.utils.swipe(el, 50);
+        browser.utils.sendKeys(el, 'text');
+        browser.utils.sendKeys(el, 'text', {scrollIntoView: true});
+        browser.utils.getText(el);
+        browser.utils.isSelected(el);
+        browser.utils.isPresent(el);
+        browser.utils.isDisplayed(el);
+        browser.utils.isInvisible(el);
+        browser.utils.hasText(el, text);
+        browser.utils.hasClass(el, 'has-error');
+        browser.utils.waitelmentPresence(el);
+        browser.utils.waitelmentClickable(el);
+        browser.utils.moveMouseTo(el);
+        browser.utils.scrollIntoView(el);
         browser.utils.clearBrowserInstance();
         browser.utils.checkScreen('name');
-        browser.utils.checkElement('name', ele);
-        browser.utils.checkElement('name', ele, {waitClickable: 15000});
+        browser.utils.checkelment('name', el);
+        browser.utils.checkelment('name', el, {waitClickable: 1500});
+        browser.utils.uploadFile(filePath)
+        browser.utils.uploadFile(filePath, 1)
         browser.utils.newTab(url)
         browser.utils.switchToTab(1);
-        browser.utils.switchToFrame();      
+        browser.utils.switchToFrame(); 
+        browser.utils.switchToFrame(1); 
+        browser.utils.printElement(el):     
     });
 });
 ```

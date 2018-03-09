@@ -1,14 +1,17 @@
 'use strict';
 
-const protractorImageComparison = require('protractor-image-comparison');
+const ProtractorImageComparison = require('protractor-image-comparison');
 
 /**
  * Protractor Utils Helper Class
  */
 class ProtractorUtilsModule {
-
+    /**
+     * Constructor
+     * @param config
+     * @param configImageComparison
+     */
     constructor(config, configImageComparison) {
-
         this.config = {
             wait: config && config.hasOwnProperty('wait') ? config.wait : 200,
             waitPresence: config && config.hasOwnProperty('waitPresence') ? config.waitPresence : 5000,
@@ -17,13 +20,12 @@ class ProtractorUtilsModule {
             imageComparison: config && config.hasOwnProperty('imageComparison') ? config.imageComparison : {},
         };
 
-        this.protractorImageComparison = new protractorImageComparison({
+        this.protractorImageComparison = new ProtractorImageComparison({
             baselineFolder: configImageComparison && configImageComparison.hasOwnProperty('baselineFolder') ?
                 configImageComparison.baselineFolder : './images/expected/',
             screenshotPath: configImageComparison && configImageComparison.hasOwnProperty('screenshotPath') ?
                 configImageComparison.screenshotPath : './images/given/',
         });
-
     };
 
     /**
@@ -31,7 +33,7 @@ class ProtractorUtilsModule {
      * @param path
      */
     get(path) {
-        if(!browser.baseUrl) {
+        if (!browser.baseUrl) {
             throw new Error('unable to exeute get(). Please define config.baseUrl in protractor configuration file');
         }
         return browser.get(browser.baseUrl + path);
@@ -39,22 +41,22 @@ class ProtractorUtilsModule {
 
     /**
      * extended selenium element.click function
-     * @param element
+     * @param el
      * @param options
-     * @returns {ActionSequence | promise.Promise<void> | webdriver.promise.Promise.<void> | *}
+     * @returns {promise.Promise.<any>}
      */
-    click(element, options) {
+    click(el, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(element, options);
+        this._optionExecutor(el, options);
         if (!options.moveMouse) {
-            return element.click(options.buttonType);
+            return el.click(options.buttonType);
         } else {
-            this.moveMouseTo(element, options);
-            return element.getSize().then((size) => {
+            this.moveMouseTo(el);
+            return el.getSize().then((size) => {
                 const x = (options.moveMouse.x) ? size.width + options.moveMouse.x : 0;
                 const y = (options.moveMouse.y) ? size.height + options.moveMouse.y : 0;
                 return browser.actions()
-                    .mouseMove({x:x, y:y})
+                    .mouseMove({x: x, y: y})
                     .click(options.buttonType)
                     .perform();
             });
@@ -62,156 +64,223 @@ class ProtractorUtilsModule {
     }
 
     /**
-     * function to select an element of a dropdown list
+     * function to double click an element
      * @param element
+     * @param options
+     * @returns {promise.Promise.<any>}
+     */
+    doubleClick(element, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(element, options);
+        return browser.actions().doubleClick(element).perform();
+    }
+
+    /**
+     * function to select an element of a dropdown list
+     * @param el
      * @param byOption
      * @param optionNumber
      * @param options
-     * @returns {ActionSequence|promise.Promise.<void>|webdriver.promise.Promise.<void>|*}
+     * @returns {promise.Promise.<any>}
      */
-    clickDropdown(element, byOption, optionNumber, options) {
+    clickDropdown(el, byOption, optionNumber, options) {
         options = this._optionSetter(options);
-        this.click(element, options);
+        this.click(el, options);
+        return this.click(el.all(byOption).get(optionNumber), options);
+    }
 
-        return this.click(element.all(byOption).get(optionNumber), options);
+    /**
+     * function to swipe left (distance=-50) or right (distance=50)
+     * @param el
+     * @param distance
+     * @param options
+     * @returns {promise.Promise.<any>}
+     */
+    swipe(el, distance, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(el, options);
+        return browser.driver
+            .actions()
+            .mouseDown(el)
+            .mouseMove({
+                x: distance,
+                y: 0,
+            })
+            .mouseUp().perform();
     }
 
     /**
      * extended selenium element.sendKeys function
-     * @param element
+     * @param el
      * @param text
      * @param options
-     * @returns {promise.Promise<any>}
+     * @returns {promise.Promise.<any>}
      */
-    sendKeys(element, text, options) {
+    sendKeys(el, text, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(element, options);
-        return element.clear().then(function() {
-            return element.sendKeys(text);
+        this._optionExecutor(el, options);
+        return el.clear().then(function() {
+            return el.sendKeys(text);
         });
     }
 
     /**
      * extended selenium element.getText function
-     * @param element
+     * @param el
      * @param options
-     * @returns {promise.Promise<string> | webdriver.promise.Promise.<string> | promise.Promise.<boolean> | webdriver.promise.Promise.<boolean>}
+     * @returns {promise.Promise.<any>}
      */
-    getText(element, options) {
+    getText(el, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(element, options);
-        return element.getText().then(function (text) {
+        this._optionExecutor(el, options);
+        return el.getText().then(function(text) {
             return text.replace(/\s/g, ' ');
         });
     }
 
     /**
      * extends selenium element.isSelected function
-     * @param element
+     * @param el
      * @param options
-     * @returns {*|promise.Promise<boolean>|webdriver.promise.Promise.<boolean>}
+     * @returns {promise.Promise.<any>}
      */
-    isSelected(element, options) {
+    isSelected(el, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(element, options);
-        return element.isSelected();
+        this._optionExecutor(el, options);
+        return el.isSelected();
+    }
+
+    /**
+     * extended selenium element.isPresent function
+     * @param el
+     * @param options
+     * @returns {promise.Promise.<any>}
+     */
+    isPresent(el, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(el, options);
+        return el.isPresent();
     }
 
     /**
      * extended selenium element.isDisplayed function
-     * @param element
+     * @param el
      * @param options
-     * @returns {webdriver.promise.Promise.<boolean>|promise.Promise<boolean>|*}
+     * @returns {promise.Promise.<any>}
      */
-    isDisplayed(element, options) {
+    isDisplayed(el, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(element, options);
-        return element.isDisplayed();
+        this._optionExecutor(el, options);
+        return el.isDisplayed();
     }
 
     /**
      * function to wait until an element is invisible
-     * @param element
+     * @param el
      * @param options
-     * @returns {Function}
+     * @returns {promise.Promise.<any>}
      */
-    isInvisible(element, options) {
+    isInvisible(el, options) {
         options = this._optionSetter(options);
-        browser.wait(protractor.ExpectedConditions.invisibilityOf(element), options.waitInvisible)
-        return protractor.ExpectedConditions.invisibilityOf(element)();
+        browser.wait(protractor.ExpectedConditions.invisibilityOf(el), options.waitInvisible).catch(() => {});
+        return protractor.ExpectedConditions.invisibilityOf(el)();
     }
 
     /**
-     * Check if element has a given class
-     * @param element
-     * @param cls
-     * @returns {promise.Promise<any>}
+     * function to wait until an element contain a given text
+     * @param el
+     * @param text
+     * @param options
+     * @returns {promise.Promise.<any>}
      */
-    hasClass(element, cls, options) {
+    hasText(el, text, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(element, options);
-        return element.getAttribute('class').then(function (classes) {
+        browser.wait(protractor.ExpectedConditions.textToBePresentInElement(el, text), options.waitClickable).catch(() => {});
+        return protractor.ExpectedConditions.textToBePresentInElement(el, text)();
+    }
+
+    /**
+     * function to heck if element has a given class
+     * @param el
+     * @param cls
+     * @param options
+     * @returns {promise.Promise.<any>}
+     */
+    hasClass(el, cls, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(el, options);
+        return el.getAttribute('class').then(function(classes) {
             return classes.split(' ').indexOf(cls) !== -1;
         });
     }
 
     /**
-     * function to wait until an element is clickable
-     * @param element
+     * function to wait until an element is present
+     * @param el
      * @param options
-     * @returns {boolean}
+     * @returns {promise.Promise.<any>}
      */
-    waitElementClickable(element, options) {
+    waitElementPresence(el, options) {
         options = this._optionSetter(options);
-        return browser.wait(protractor.ExpectedConditions.elementToBeClickable(element), options.waitClickable).catch(() => {});
+        return browser.wait(protractor.ExpectedConditions.presenceOf(el), options.waitClickable).catch(() => {});
     }
 
     /**
-     * function to wait until an element is present
-     * @param element
+     * function to wait until an element is clickable
+     * @param el
      * @param options
-     * @returns {Q.Promise<any> | Promise.<T> | promise.Promise<any>}
+     * @returns {promise.Promise.<any>}
      */
-    waitElementPresence(element, options) {
+    waitElementClickable(el, options) {
         options = this._optionSetter(options);
-        return browser.wait(protractor.ExpectedConditions.presenceOf(element), options.waitClickable).catch(() => {});
+        return browser.wait(protractor.ExpectedConditions.elementToBeClickable(el), options.waitClickable).catch(() => {});
     }
 
     /**
      * function to scroll element into viewport
-     * @param element
-     * @returns {promise.Promise.<T>|promise.Promise<any>}
+     * @param el
+     * @returns {promise.Promise.<any>}
      */
-    scrollIntoView(element, options) {
-        return browser.executeScript('arguments[0].scrollIntoView();', element.getWebElement());
+    scrollIntoView(el) {
+        return browser.executeScript('arguments[0].scrollIntoView();', el.getWebElement());
     }
 
     /**
      * function to move mouse to element
-     * @param element
-     * @param options
-     * @returns {promise.Promise<void>}
+     * @param el
+     * @returns {promise.Promise.<any>}
      */
-    moveMouseTo(element, options) {
-        options = this._optionSetter(options);
-        return browser.actions().mouseMove(element).perform();
+    moveMouseTo(el) {
+        return browser.actions().mouseMove(el).perform();
     }
 
     /**
-     * function to clear cookies, session, storage
-     * @returns {promise.Promise.<T>|promise.Promise<any>}
+     * function to upload a file
+     * @param filePath
+     * @param indexOfElement
+     * @returns {promise.Promise.<any>}
      */
-    clearBrowserInstance() {
-        browser.manage().deleteAllCookies();
-        browser.executeScript('window.localStorage.clear()');
-        return browser.executeScript('sessionStorage.clear()');
+    uploadFile(filePath, indexOfElement) {
+        indexOfElement = indexOfElement || 0;
+        const el = element.all(by.css('input[type="file"]')).get(indexOfElement);
+        const dirname = __dirname.split('/').reverse().splice(2).reverse().join('/');
+        const absolutePath = require('path').resolve(dirname, filePath);
+        const remote = require('../../node_modules/selenium-webdriver/remote');
+        browser.setFileDetector(new remote.FileDetector());
+        browser.executeScript(
+            'arguments[0].style.visibility = "visible";' +
+            'arguments[0].style.height = "1px";' +
+            'arguments[0].style.width = "1px";' +
+            'arguments[0].style.opacity = 1',
+            el.getWebElement());
+        return el.sendKeys(absolutePath);
     }
 
     /**
      * extended image comparison function check screen
      * @param tag
      * @param options
-     * @return {Promise}
+     * @return {promise.Promise.<any>}
      */
     checkScreen(tag, options) {
         options = this._optionSetter(options);
@@ -222,20 +291,30 @@ class ProtractorUtilsModule {
     /**
      * extended image comparison function check element
      * @param tag
-     * @param element
+     * @param el
      * @param options
-     * @return {Promise}
+     * @return {promise.Promise.<any>}
      */
-    checkElement(tag, element, options) {
+    checkElement(tag, el, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(element, options);
-        return this.protractorImageComparison.checkElement(element, tag, options.imageComparison);
+        this._optionExecutor(el, options);
+        return this.protractorImageComparison.checkElement(el, tag, options.imageComparison);
     }
 
     /**
-     * opens a url in a new tab
+     * function to clear cookies, session, storage
+     * @returns {promise.Promise.<any>}
+     */
+    clearBrowserInstance() {
+        browser.manage().deleteAllCookies();
+        browser.executeScript('window.localStorage.clear()');
+        return browser.executeScript('sessionStorage.clear()');
+    }
+
+    /**
+     * function to open a url in a new tab
      * @param url
-     * @returns {promise.Promise.<T>|promise.Promise<any>}
+     * @returns {promise.Promise.<any>}
      */
     newTab(url) {
         return browser.executeScript('return window.open(arguments[0], "_blank")', url);
@@ -243,31 +322,54 @@ class ProtractorUtilsModule {
 
     /**
      * switch to specific browser tab
-     * @param tab
-     * @returns {promise.Promise<any>}
+     * @param indexOfTab
+     * @returns {promise.Promise.<any>}
      */
-    switchToTab(tab) {
+    switchToTab(indexOfTab) {
         return browser.getAllWindowHandles().then(function(handles) {
-            return browser.switchTo().window(handles[tab]);
+            return browser.switchTo().window(handles[indexOfTab]);
         });
     }
 
     /**
-     * switch to iFrame
+     * function to switch to iFrame
+     * @param indexOfFrame
      * @param options
-     * @returns {*}
+     * @returns {promise.Promise<any>}
      */
-    switchToFrame(options) {
-        const ele = element(by.tagName('iframe'));
+    switchToFrame(indexOfFrame, options) {
+        indexOfFrame = indexOfFrame || 0;
+        const el = element.all(by.tagName('iframe')).get(indexOfFrame);
+        this._optionExecutor(el, options);
+        return browser.switchTo().frame(el.getWebElement());
+    }
+
+    /**
+     * function to print element properties
+     * @param el
+     * @param options
+     * @returns {promise.Promise.<any>}
+     */
+    printElement(el, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(ele, options);
-        return browser.switchTo().frame(ele.getWebElement());
+        this._optionExecutor(el, options);
+        const locator = el.locator();
+        console.log('locator: ', locator.toString());
+        element.all(locator).then((res) => console.log('findElements: ', res.length));
+        el.isPresent().then((res) => console.log('isPresent: ', res));
+        return el.isDisplayed().then(function(res) {
+            console.log('isDisplayed: ', res);
+            el.getText().then((res) => console.log('getText: ', res.toString()));
+            el.getLocation().then((res) => console.log('getLocation: x ', res.x, ' y ', res.y));
+            return el.getSize().then((res) => console.log('getSize: w ', res.width, ' h ', res.height));
+        }).catch(() => console.log('isDisplayed: false'));
     }
 
     /**
      * private function to set options {wait, waitClickable, scrollIntoView, moveMouse, listElement, imageComparison}
      * @param options
-     * @returns {{wait: *, waitClickable: number, scrollIntoView: boolean, moveMouse: boolean, imageComparison: {}}}
+     * @returns {{wait: (number|*), waitPresence: (number|*), waitInvisible: (number|*), waitClickable: (number|*),
+     * imageComparison: ({}|*|ProtractorUtilsModule.config.imageComparison), scrollIntoView: boolean, moveMouse: boolean, buttonType: *}}
      * @private
      */
     _optionSetter(options) {
@@ -287,28 +389,27 @@ class ProtractorUtilsModule {
 
     /**
      * private function to execute options
-     * @param element
+     * @param el
      * @param options
      * @private
      */
-    _optionExecutor(element, options) {
-        if (options.wait !== false && options.wait !== 0) {
+    _optionExecutor(el, options) {
+        if (options.wait) {
             browser.sleep(options.wait);
         }
-        if (options.waitPresence !== false && options.waitPresence !== 0) {
-            this.waitElementPresence(element, options);
+        if (options.waitPresence) {
+            this.waitElementPresence(el, options);
         }
-        if (options.waitClickable !== false && options.waitClickable !== 0) {
-            this.waitElementClickable(element, options);
+        if (options.waitClickable) {
+            this.waitElementClickable(el, options);
         }
         if (options.scrollIntoView) {
-            this.scrollIntoView(element, options);
+            this.scrollIntoView(el);
         }
         if (options.moveMouse) {
-            this.moveMouseTo(element, options);
+            this.moveMouseTo(el);
         }
     }
-
 }
 
 module.exports = ProtractorUtilsModule;
