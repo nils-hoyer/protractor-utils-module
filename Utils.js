@@ -13,11 +13,11 @@ class ProtractorUtilsModule {
      */
     constructor(config, configImageComparison) {
         this.config = {
-            wait: config && config.hasOwnProperty('wait') ? config.wait : 200,
-            waitPresence: config && config.hasOwnProperty('waitPresence') ? config.waitPresence : 5000,
-            waitInvisible: config && config.hasOwnProperty('waitInvisible') ? config.waitInvisible : 5000,
-            waitClickable: config && config.hasOwnProperty('waitClickable') ? config.waitClickable : 10000,
+            explicitWait: config && config.hasOwnProperty('explicitWait') ? config.explicitWait : 200,
+            implicitWait: config && config.hasOwnProperty('implicitWait') ? config.implicitWait : 10000,
             imageComparison: config && config.hasOwnProperty('imageComparison') ? config.imageComparison : {},
+            scrollIntoView: config && config.hasOwnProperty('scrollIntoView') ? config.scrollIntoView : false,
+            moveMouse: config && config.hasOwnProperty('moveMouse') ? config.moveMouse : false,
         };
 
         this.protractorImageComparison = new ProtractorImageComparison({
@@ -125,6 +125,22 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * function to send special key
+     * @param key
+     * @returns {promise.Promise<any>}
+     */
+    sendKey(key) {
+        switch (key.toLowerCase()) {
+            case 'enter':
+                key = protractor.Key.ENTER;
+                break;
+        }
+        return browser.actions()
+            .sendKeys(key)
+            .perform();
+    }
+
+    /**
      * extended selenium element.getText function
      * @param el
      * @param options
@@ -175,19 +191,19 @@ class ProtractorUtilsModule {
     }
 
     /**
-     * function to wait until an element is invisible
+     * function to explicitWait until an element is invisible
      * @param el
      * @param options
      * @returns {promise.Promise.<any>}
      */
     isInvisible(el, options) {
         options = this._optionSetter(options);
-        browser.wait(protractor.ExpectedConditions.invisibilityOf(el), options.waitInvisible).catch(() => {});
+        browser.wait(protractor.ExpectedConditions.invisibilityOf(el), options.implicitWait).catch(() => {});
         return protractor.ExpectedConditions.invisibilityOf(el)();
     }
 
     /**
-     * function to wait until an element contain a given text
+     * function to explicitWait until an element contain a given text
      * @param el
      * @param text
      * @param options
@@ -195,7 +211,7 @@ class ProtractorUtilsModule {
      */
     hasText(el, text, options) {
         options = this._optionSetter(options);
-        browser.wait(protractor.ExpectedConditions.textToBePresentInElement(el, text), options.waitClickable).catch(() => {});
+        browser.wait(protractor.ExpectedConditions.textToBePresentInElement(el, text), options.implicitWait).catch(() => {});
         return protractor.ExpectedConditions.textToBePresentInElement(el, text)();
     }
 
@@ -215,25 +231,25 @@ class ProtractorUtilsModule {
     }
 
     /**
-     * function to wait until an element is present
+     * function to explicitWait until an element is present
      * @param el
      * @param options
      * @returns {promise.Promise.<any>}
      */
     waitElementPresence(el, options) {
         options = this._optionSetter(options);
-        return browser.wait(protractor.ExpectedConditions.presenceOf(el), options.waitClickable).catch(() => {});
+        return browser.wait(protractor.ExpectedConditions.presenceOf(el), options.implicitWait).catch(() => {});
     }
 
     /**
-     * function to wait until an element is clickable
+     * function to explicitWait until an element is clickable
      * @param el
      * @param options
      * @returns {promise.Promise.<any>}
      */
     waitElementClickable(el, options) {
         options = this._optionSetter(options);
-        return browser.wait(protractor.ExpectedConditions.elementToBeClickable(el), options.waitClickable).catch(() => {});
+        return browser.wait(protractor.ExpectedConditions.elementToBeClickable(el), options.implicitWait).catch(() => {});
     }
 
     /**
@@ -332,6 +348,24 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * function to wait for the element to be visible and then drags the element
+     * @param element
+     * @returns {promise.Promise<any>}
+     */
+    drag(element) {
+        return browser.actions().mouseDown(element || {x: element.x, y: element.y}).perform();
+    }
+
+    /**
+     * function to wait for the element to be visible and then drops the element
+     * @param element
+     * @returns {promise.Promise<void>}
+     */
+    drop(element) {
+        return browser.actions().mouseMove(element).mouseUp().perform();
+    }
+
+    /**
      * function to switch to iFrame
      * @param indexOfFrame
      * @param options
@@ -339,16 +373,17 @@ class ProtractorUtilsModule {
      */
     switchToFrame(indexOfFrame, options) {
         indexOfFrame = indexOfFrame || 0;
-        const el = element.all(by.tagName('iframe')).get(indexOfFrame);
-        this._optionExecutor(el, options);
-        return browser.switchTo().frame(el.getWebElement());
+        const ele = element.all(by.tagName('iframe')).get(indexOfFrame);
+        options = this._optionSetter(options);
+        this._optionExecutor(ele, options);
+        return browser.switchTo().frame(ele.getWebElement());
     }
 
     /**
      * function to print element properties
      * @param el
      * @param options
-     * @returns {promise.Promise.<any>}
+     * @returns {promise.Promise<any>}
      */
     printElement(el, options) {
         options = this._optionSetter(options);
@@ -366,24 +401,35 @@ class ProtractorUtilsModule {
     }
 
     /**
-     * private function to set options {wait, waitClickable, scrollIntoView, moveMouse, listElement, imageComparison}
+     * function to explicit wait an amount of time
+     * @param ms
+     * @param msg
+     * @returns {promise.Promise<any>}
+     */
+    sleep(ms, msg) {
+        if (!msg) throw new Error('parameter msg is missing');
+        return browser.sleep(ms);
+    }
+
+    /**
+     * private function to set options
      * @param options
-     * @returns {{wait: (number|*), waitPresence: (number|*), waitInvisible: (number|*), waitClickable: (number|*),
-     * imageComparison: ({}|*|ProtractorUtilsModule.config.imageComparison), scrollIntoView: boolean, moveMouse: boolean, buttonType: *}}
+     * @returns {{explicitWait: (number|*),
+     * implicitWait: (number|*),
+     * imageComparison: ({}|*|ProtractorUtilsModule.config.imageComparison),
+     * scrollIntoView: boolean,
+     * moveMouse: boolean,
+     * buttonType: *}}
      * @private
      */
     _optionSetter(options) {
         return {
-            wait: options && options.hasOwnProperty('wait') ? options.wait : this.config.wait,
-            waitPresence: options && options.hasOwnProperty('waitPresence') ? options.waitPresence : this.config.waitPresence,
-            waitInvisible: options && options.hasOwnProperty('waitInvisible') ? options.waitInvisible : this.config.waitInvisible,
-            waitClickable: options && options.hasOwnProperty('waitClickable') ? options.waitClickable : this.config.waitClickable,
+            explicitWait: options && options.hasOwnProperty('explicitWait') ? options.explicitWait : this.config.explicitWait,
+            implicitWait: options && options.hasOwnProperty('implicitWait') ? options.implicitWait : this.config.implicitWait,
             imageComparison: options && options.hasOwnProperty('imageComparison') ? options.imageComparison : this.config.imageComparison,
-
-            scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : false,
-            moveMouse: options && options.hasOwnProperty('moveMouse') ? options.moveMouse : false,
-            buttonType: options && options.hasOwnProperty('buttonType') && options.buttonType === 'right'
-                ? protractor.Button.RIGHT : protractor.Button.LEFT,
+            scrollIntoView: options && options.hasOwnProperty('scrollIntoView') ? options.scrollIntoView : this.config.scrollIntoView,
+            moveMouse: options && options.hasOwnProperty('moveMouse') ? options.moveMouse : this.config.moveMouse,
+            buttonType: options && options.hasOwnProperty('buttonType') && options.buttonType === 'right' ? protractor.Button.RIGHT : protractor.Button.LEFT,
         };
     }
 
@@ -394,13 +440,10 @@ class ProtractorUtilsModule {
      * @private
      */
     _optionExecutor(el, options) {
-        if (options.wait) {
-            browser.sleep(options.wait);
+        if (options.explicitWait) {
+            browser.sleep(options.explicitWait);
         }
-        if (options.waitPresence) {
-            this.waitElementPresence(el, options);
-        }
-        if (options.waitClickable) {
+        if (options.implicitWait) {
             this.waitElementClickable(el, options);
         }
         if (options.scrollIntoView) {
