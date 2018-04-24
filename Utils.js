@@ -165,15 +165,15 @@ class ProtractorUtilsModule {
     }
 
     /**
-     * function to set value to element by replace(RegExp | String)
+     * function to set value to element by regExp
      * @param el
+     * @param search
      * @param replace
-     * @param regEx | string
      * @returns {promise.Promise<any>}
      */
-    setTextByReplace(el, search, replace) {
+    setTextByRegEx(el, search, replace) {
         return browser.executeScript('arguments[0].innerHTML = arguments[0].innerHTML.replace(' +
-            new RegExp(search, 'g') + ',' + '\'' + replace + '\'' +  ')', el);
+            search + ',' + '\'' + replace + '\'' +  ')', el);
     }
 
     /**
