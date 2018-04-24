@@ -52,8 +52,8 @@ describe('protractor-utils-module', function() {
         browser.utils.sendKeys(el, 'text', {scrollIntoView: true});
         browser.utils.sendKey('enter');
         browser.utils.getText(el);
-        browser.utils.setText(el, str);
-        browser.utils.setTextByRegEx(el, str, regEx)
+        browser.utils.setText(el, replace);
+        browser.utils.setTextByRegEx(el, search, replace)
         browser.utils.isSelected(el);
         browser.utils.isPresent(el);
         browser.utils.isDisplayed(el);

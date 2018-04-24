@@ -157,23 +157,23 @@ class ProtractorUtilsModule {
     /**
      * function to set value to element
      * @param el
-     * @param str
+     * @param replace
      * @returns {promise.Promise.<any>}
      */
-    setText(el, str) {
-        return browser.executeScript('arguments[0].innerHTML = \''+str+'\'', el);
+    setText(el, replace) {
+        return browser.executeScript('arguments[0].innerText = \''+replace+'\'', el);
     }
 
     /**
-     * function to set value to element matching regEx
+     * function to set value to element by replace(RegExp | String)
      * @param el
-     * @param str
-     * @param regEx
+     * @param replace
+     * @param regEx | string
      * @returns {promise.Promise<any>}
      */
-    setTextByRegEx(el, str, regEx) {
+    setTextByReplace(el, search, replace) {
         return browser.executeScript('arguments[0].innerHTML = arguments[0].innerHTML.replace(' +
-            regEx + ',' + '\'' + str + '\'' +  ')', el);
+            new RegExp(search, 'g') + ',' + '\'' + replace + '\'' +  ')', el);
     }
 
     /**
