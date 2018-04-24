@@ -65,9 +65,10 @@ describe('protractor-utils-module', function() {
         browser.utils.moveMouseTo(el);
         browser.utils.scrollIntoView(el);
         browser.utils.clearBrowserInstance();
+        browser.utils.checkFullPageScreen('name');
         browser.utils.checkScreen('name');
-        browser.utils.checkelment('name', el);
-        browser.utils.checkelment('name', el, {implicitWait: 7500});
+        browser.utils.checkElement('name', el);
+        browser.utils.checkElement('name', el, {implicitWait: 7500});
         browser.utils.uploadFile(filePath)
         browser.utils.uploadFile(filePath, 1)
         browser.utils.newTab(url)

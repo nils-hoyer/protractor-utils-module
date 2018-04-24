@@ -315,6 +315,18 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * extended image comparison function check full page screen
+     * @param tag
+     * @param options
+     * @return {promise.Promise.<any>}
+     */
+    checkFullPageScreen(tag, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(element(by.css('html')), options);
+        return this.protractorImageComparison.checkFullPageScreen(tag, options.imageComparison);
+    }
+
+    /**
      * extended image comparison function check screen
      * @param tag
      * @param options
