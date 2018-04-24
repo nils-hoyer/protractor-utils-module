@@ -165,6 +165,18 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * function to set value to element matching regEx
+     * @param el
+     * @param str
+     * @param regEx
+     * @returns {promise.Promise<any>}
+     */
+    setTextByRegEx(el, str, regEx) {
+        return browser.executeScript('arguments[0].innerHTML = arguments[0].innerHTML.replace(' +
+            regEx + ',' + '\'' + str + '\'' +  ')', el);
+    }
+
+    /**
      * extends selenium element.isSelected function
      * @param el
      * @param options
