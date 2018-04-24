@@ -155,6 +155,16 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * function to set value to element
+     * @param el
+     * @param str
+     * @returns {promise.Promise.<any>}
+     */
+    setText(el, str) {
+        return browser.executeScript('arguments[0].innerHTML = \''+str+'\'', el);
+    }
+
+    /**
      * extends selenium element.isSelected function
      * @param el
      * @param options

@@ -52,6 +52,7 @@ describe('protractor-utils-module', function() {
         browser.utils.sendKeys(el, 'text', {scrollIntoView: true});
         browser.utils.sendKey('enter');
         browser.utils.getText(el);
+        browser.utils.setText(el, str);
         browser.utils.isSelected(el);
         browser.utils.isPresent(el);
         browser.utils.isDisplayed(el);
