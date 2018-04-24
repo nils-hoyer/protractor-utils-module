@@ -386,7 +386,8 @@ class ProtractorUtilsModule {
         const ele = element.all(by.tagName('iframe')).get(indexOfFrame);
         options = this._optionSetter(options);
         this._optionExecutor(ele, options);
-        return browser.switchTo().frame(ele.getWebElement());
+        return browser.switchTo().frame(ele.getWebElement())
+            .then(browser.sleep(500));
     }
 
     /**
