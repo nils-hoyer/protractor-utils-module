@@ -434,17 +434,18 @@ class ProtractorUtilsModule {
      */
     printElement(el, options) {
         options = this._optionSetter(options);
-        this._optionExecutor(el, options);
-        const locator = el.locator();
-        console.log('locator: ', locator.toString());
-        element.all(locator).then((res) => console.log('findElements: ', res.length));
-        el.isPresent().then((res) => console.log('isPresent: ', res));
-        return el.isDisplayed().then(function(res) {
-            console.log('isDisplayed: ', res);
-            el.getText().then((res) => console.log('getText: ', res.toString()));
-            el.getLocation().then((res) => console.log('getLocation: x ', res.x, ' y ', res.y));
-            return el.getSize().then((res) => console.log('getSize: w ', res.width, ' h ', res.height));
-        }).catch(() => console.log('isDisplayed: false'));
+        this._optionExecutor(el, options).then((r) => {
+            const locator = el.locator();
+            console.log('locator: ', locator.toString());
+            element.all(locator).then((res) => console.log('findElements: ', res.length));
+            el.isPresent().then((res) => console.log('isPresent: ', res));
+            return el.isDisplayed().then(function(res) {
+                console.log('isDisplayed: ', res);
+                el.getText().then((res) => console.log('getText: ', res.toString()));
+                el.getLocation().then((res) => console.log('getLocation: x ', res.x, ' y ', res.y));
+                return el.getSize().then((res) => console.log('getSize: w ', res.width, ' h ', res.height));
+            }).catch(() => console.log('isDisplayed: false'));
+        });
     }
 
     /**
@@ -487,18 +488,20 @@ class ProtractorUtilsModule {
      * @private
      */
     _optionExecutor(el, options) {
+        const promiseArray = [];
         if (options.explicitWait) {
-            browser.sleep(options.explicitWait);
+            promiseArray.push(browser.sleep(options.explicitWait));
         }
         if (options.implicitWait) {
-            this.waitElementClickable(el, options);
+            promiseArray.push(this.waitElementClickable(el, options));
         }
         if (options.scrollIntoView) {
-            this.scrollIntoView(el);
+            promiseArray.push(this.scrollIntoView(el));
         }
         if (options.moveMouse) {
-            this.moveMouseTo(el);
+            promiseArray.push(this.moveMouseTo(el));
         }
+        return Promise.all(promiseArray)
     }
 }
 
