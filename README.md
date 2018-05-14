@@ -36,7 +36,7 @@ exports.config = {
 
 in your jasmine test you can use the following functions:
 ```
-const el = elment(by.css('.elment'));
+const el = elment(by.css('.someElement'));
 const opt = by.css('option');
 const url = 'https://www.google.de'
 
@@ -52,6 +52,7 @@ describe('protractor-utils-module', function() {
         browser.utils.sendKeys(el, 'text', {scrollIntoView: true});
         browser.utils.sendKey('enter');
         browser.utils.getText(el);
+        browser.utils.getTextInput(el);
         browser.utils.setText(el, replace);
         browser.utils.setTextByRegEx(el, search, replace)
         browser.utils.isSelected(el);
@@ -60,8 +61,8 @@ describe('protractor-utils-module', function() {
         browser.utils.isInvisible(el);
         browser.utils.hasText(el, text);
         browser.utils.hasClass(el, 'has-error');
-        browser.utils.waitelmentPresence(el);
-        browser.utils.waitelmentClickable(el);
+        browser.utils.waitElmentPresence(el);
+        browser.utils.waitElmentClickable(el);
         browser.utils.moveMouseTo(el);
         browser.utils.scrollIntoView(el);
         browser.utils.clearBrowserInstance();

@@ -155,6 +155,18 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * function to get the text of an element of type input
+     * @param el
+     * @param options
+     * @returns {promise.Promise.<any>}
+     */
+    getTextInput(el, options) {
+        options = this._optionSetter(options);
+        this._optionExecutor(el, options);
+        return el.getAttribute('value');
+    }
+
+    /**
      * function to set value to element
      * @param el
      * @param replace
