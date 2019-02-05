@@ -1,6 +1,6 @@
 {
   "name": "protractor-utils-module",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "protractor utils module ensures visibility of elements before interaction",
   "main": "Utils.js",
   "repository": {
@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/nils-hoyer/protractor-utils-module#readme",
   "dependencies": {
-    "protractor-image-comparison": "^1.5.0"
+    "protractor-image-comparison": "2.0.1"
   }
 }
