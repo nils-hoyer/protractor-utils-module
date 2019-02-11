@@ -1,8 +1,8 @@
 {
   "name": "protractor-utils-module",
-  "version": "3.3.2",
-  "description": "protractor utils module ensures visibility of elements before interaction",
-  "main": "Utils.js",
+  "version": "4.0.0",
+  "description": "protractor-utils-module enriches functionality and usage of protractor",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nils-hoyer/protractor-utils-module.git"
