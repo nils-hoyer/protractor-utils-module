@@ -190,7 +190,7 @@ class ProtractorUtilsModule {
      * @param replace
      * @returns {promise.Promise.<any>}
      */
-    setText(el, replace) {
+    setText(el, replace, options) {
         options = this._optionGetter(options);
         this._optionExecutor(el, options);
 
@@ -204,7 +204,7 @@ class ProtractorUtilsModule {
      * @param replace
      * @returns {promise.Promise<any>}
      */
-    setTextByRegEx(el, search, replace) {
+    setTextByRegEx(el, search, replace, options) {
         options = this._optionGetter(options);
         this._optionExecutor(el, options);
 

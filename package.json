@@ -1,6 +1,6 @@
 {
   "name": "protractor-utils-module",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "protractor-utils-module enriches functionality and usage of protractor",
   "main": "index.js",
   "repository": {

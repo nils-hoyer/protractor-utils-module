@@ -1,5 +1,5 @@
 # protractor-utils-module
-protractor-utils-module enriches functionality and usage of protractor in very easy way
+protractor-utils-module enriches functionality and usage of protractor
 
 # usage
 The protractor-utils-module is available via npm:
@@ -38,12 +38,12 @@ in your jasmine test you can use the following functions:
 ```
 const el = elment(by.css('.someElement'));
 const url = 'https://www.google.de'
-const regEx = '/pattern/'
+const regEx = '/pattern/g'
 
 // options parameter is always optional
 options = {
-    explicitWait: integer
-    implicitWait: integer
+    explicitWait: number
+    implicitWait: number
     scrollIntoView: boolean
     moveMouse: boolean
     imageComparison: object
