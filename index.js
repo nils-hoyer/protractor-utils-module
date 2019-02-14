@@ -400,6 +400,19 @@ class ProtractorUtilsModule {
     }
 
     /**
+     * function to remove an element from the document
+     * @param el
+     * @param options
+     * @returns {promise.Promise<any> | !promise.Promise<T>}
+     */
+    removeElement(el, options) {
+        options = this._optionGetter(options);
+        this._optionExecutor(el, options);
+
+        return browser.executeScript('arguments[0].remove();', el);
+    }
+
+    /**
      * function to log element properties to console
      * @param el
      * @param options

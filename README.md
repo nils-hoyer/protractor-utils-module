@@ -81,7 +81,8 @@ describe('protractor-utils-module', function() {
         browser.utils.newTab(url)
         browser.utils.switchToTab(1);
         browser.utils.switchToFrame(); 
-        browser.utils.switchToFrame(1); 
+        browser.utils.switchToFrame(1);
+        vrowser.utils.removeElement(el); 
         browser.utils.logElement(el);
         browser.utils.sleep(1000, 'wait async call to finish')
         browser.utils.checkFullPageScreen('tagName');
